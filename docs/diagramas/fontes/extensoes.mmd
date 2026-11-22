@@ -1,0 +1,29 @@
+---
+title: Extensões modeladas (evolução futura, sem implementação nesta versão)
+---
+classDiagram
+    direction TB
+
+    class NivelFidelidade {
+        <<modelado - evolução>>
+        -String nome
+        -int pontosMinimos12Meses
+        -BigDecimal percentualDesconto
+    }
+    class Campanha {
+        <<modelado - evolução>>
+        -String nome
+        -LocalDate inicio
+        -LocalDate fim
+        -String faixaEtaria
+        -Regiao regiao
+        -int frequenciaMinima
+        -BigDecimal percentualDesconto
+        +elegivel(Cliente c) boolean
+    }
+    class MetaUnidade {
+        <<modelado - evolução>>
+        -YearMonth competencia
+        -BigDecimal metaFaturamento
+        -int metaPedidos
+    }

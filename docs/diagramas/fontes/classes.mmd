@@ -1,0 +1,163 @@
+---
+title: Diagrama de Classes — Domínio da API Raízes do Nordeste
+---
+classDiagram
+    direction TB
+
+    class Unidade {
+        -id
+        -String nome
+        -String cidade
+        -String uf
+        -Regiao regiao
+        -FormatoUnidade formato
+        -boolean ativa
+        +possuiCozinhaCompleta() boolean
+    }
+    class Produto {
+        -id
+        -String nome
+        -String descricao
+        -CategoriaProduto categoria
+        -BigDecimal precoBase
+        -boolean exigeCozinhaCompleta
+        -boolean ativo
+    }
+    class ItemCardapio {
+        -id
+        -BigDecimal precoLocal
+        -boolean disponivel
+        -LocalDate vigenciaInicio
+        -LocalDate vigenciaFim
+        -String observacaoRegional
+        +precoVigente() BigDecimal
+        +estaVigente(LocalDate data) boolean
+    }
+    class Estoque {
+        -id
+        -int quantidade
+        -Long version
+        +baixar(int quantidade)
+        +repor(int quantidade)
+    }
+    class MovimentacaoEstoque {
+        -id
+        -TipoMovimentacao tipo
+        -int quantidade
+        -String motivo
+        -LocalDateTime dataHora
+    }
+    class Usuario {
+        -id
+        -String nome
+        -String email
+        -String senhaHash
+        -Perfil perfil
+        -boolean ativo
+    }
+    class Cliente {
+        -id
+        -String nome
+        -String email
+        -String telefone
+        -String senhaHash
+        -LocalDate dataNascimento
+        -int saldoPontos
+        -boolean anonimizado
+        +possuiConsentimento(Finalidade f) boolean
+        +faixaEtaria() String
+        +anonimizar()
+    }
+    class Consentimento {
+        -id
+        -Finalidade finalidade
+        -boolean concedido
+        -String versaoTermo
+        -LocalDateTime dataHora
+    }
+    class Pedido {
+        -id
+        -CanalPedido canal
+        -TipoAtendimento tipoAtendimento
+        -StatusPedido status
+        -BigDecimal valorItens
+        -BigDecimal valorDesconto
+        -BigDecimal valorTotal
+        -int pontosResgatados
+        -LocalDateTime criadoEm
+        -Long version
+        +adicionarItem(Produto p, int qtd, BigDecimal preco)
+        +aplicarDesconto(BigDecimal valor)
+        +alterarStatus(StatusPedido novo)
+        +cancelar()
+    }
+    class ItemPedido {
+        -id
+        -int quantidade
+        -BigDecimal precoUnitario
+        -BigDecimal subtotal
+    }
+    class HistoricoStatusPedido {
+        -id
+        -StatusPedido statusAnterior
+        -StatusPedido statusNovo
+        -LocalDateTime dataHora
+    }
+    class Pagamento {
+        -id
+        -String chaveIdempotencia
+        -String idTransacaoExterna
+        -FormaPagamento forma
+        -BigDecimal valor
+        -StatusPagamento status
+        -LocalDateTime atualizadoEm
+    }
+    class MovimentoPontos {
+        -id
+        -TipoMovimentoPontos tipo
+        -int pontos
+        -LocalDateTime dataHora
+    }
+    class RegistroAuditoria {
+        -id
+        -LocalDateTime dataHora
+        -AcaoAuditoria acao
+        -String entidade
+        -Long entidadeId
+        -String valorAnterior
+        -String valorNovo
+        -String motivo
+    }
+    class GatewayPagamento {
+        <<interface>>
+        +solicitarPagamento(SolicitacaoPagamento s) RespostaGateway
+        +solicitarEstorno(String idTransacao)
+    }
+    class GatewayPagamentoSimulado {
+        +solicitarPagamento(SolicitacaoPagamento s) RespostaGateway
+        +solicitarEstorno(String idTransacao)
+    }
+    class PagamentoService {
+        +iniciarPagamento(Long pedidoId, FormaPagamento forma) Pagamento
+        +processarRetorno(RetornoPagamento r)
+    }
+
+    Unidade "1" -- "0..*" ItemCardapio : oferece
+    Produto "1" -- "0..*" ItemCardapio : compõe
+    Unidade "1" -- "0..*" Estoque : mantém
+    Produto "1" -- "0..*" Estoque : controla
+    Estoque "1" *-- "0..*" MovimentacaoEstoque : registra
+    Unidade "0..1" -- "0..*" Usuario : lotação
+    Cliente "1" *-- "0..*" Consentimento : concede
+    Cliente "0..1" -- "0..*" Pedido : realiza
+    Unidade "1" -- "0..*" Pedido : recebe
+    Pedido "1" *-- "1..*" ItemPedido : contém
+    ItemPedido "0..*" --> "1" Produto : refere
+    Pedido "1" *-- "1..*" HistoricoStatusPedido : histórico
+    Pedido "1" -- "0..*" Pagamento : tentativas
+    Cliente "1" *-- "0..*" MovimentoPontos : extrato
+    MovimentoPontos "0..*" --> "0..1" Pedido : origem
+    Usuario "0..1" -- "0..*" RegistroAuditoria : autor
+    GatewayPagamento <|.. GatewayPagamentoSimulado : implementa
+    PagamentoService ..> GatewayPagamento : usa
+    PagamentoService ..> Pagamento : registra

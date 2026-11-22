@@ -6,7 +6,7 @@
 
 ## 1. Escopo da solução
 
-A solução é uma API REST única que atende todos os canais de venda (aplicativo, totem, balcão e retirada) e a gestão da rede (unidades e matriz). As interfaces (app, totem, telas do balcão e painel da matriz) são consumidoras da API e não fazem parte da entrega do Back-end. A API será usada em conjunto.
+A solução é uma API REST única que atende todos os canais de venda (aplicativo, totem, balcão e retirada) e a gestão da rede (unidades e matriz). As interfaces (app, totem, telas do balcão e painel da matriz) são consumidoras da API e não fazem parte da entrega do Back-end, mas o contrato da API foi desenhado para atendê-las.
 
 **Dentro do escopo**
 - Catálogo global da franquia e cardápio por unidade (formato da loja, sazonalidade, preço local).
@@ -101,7 +101,7 @@ Previsão: **Implementar** = previsto na API entregue; **Modelar** = projetado e
 | RN11 | O cadastro no programa exige declaração de maioridade (18 anos). Cadastro de menores, que dependeria de consentimento do responsável, fica fora do escopo. |
 | RN12 | A data de nascimento é opcional e, quando informada, é usada apenas como faixa etária em segmentações e relatórios. |
 | RN13 | Pedido sem cliente identificado (totem ou balcão anônimo) não acumula pontos. |
-| RN14 | O processamento da resposta do pagamento pode ocorrer mais de uma vez: a mesma transação recebida mais de uma vez não altera o resultado. Aprovação recebida para pedido já cancelado é registrada e gera solicitação de estorno. |
+| RN14 | A resposta do pagamento pode chegar mais de uma vez. O sistema processa cada transação uma única vez: repetições não alteram o resultado. Aprovação recebida para pedido já cancelado é registrada e gera solicitação de estorno. |
 | RN15 | Usuários de unidade (atendente, cozinha, gerente) operam apenas dados da própria unidade e a matriz acessa todas. |
 | RN16 | Registros de auditoria não podem ser alterados nem excluídos. |
 | RN17 | Todos os pagamentos, inclusive os presenciais no balcão, passam pelo serviço externo de pagamento. |

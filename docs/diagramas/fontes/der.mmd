@@ -1,0 +1,158 @@
+---
+title: DER — Modelo físico (PostgreSQL / H2)
+---
+erDiagram
+    unidade {
+        int id PK
+        varchar nome
+        varchar cidade
+        char uf
+        varchar regiao
+        varchar formato
+        boolean ativa
+    }
+    produto {
+        int id PK
+        varchar nome
+        varchar descricao
+        varchar categoria
+        decimal preco_base
+        boolean exige_cozinha_completa
+        boolean ativo
+    }
+    item_cardapio {
+        int id PK
+        int unidade_id FK "UK com produto_id"
+        int produto_id FK
+        decimal preco_local "nulo = preço base"
+        boolean disponivel
+        date vigencia_inicio
+        date vigencia_fim
+        varchar observacao_regional
+    }
+    estoque {
+        int id PK
+        int unidade_id FK "UK com produto_id"
+        int produto_id FK
+        int quantidade "CHECK >= 0"
+        int version "bloqueio otimista"
+    }
+    movimentacao_estoque {
+        int id PK
+        int estoque_id FK
+        int usuario_id FK "nulo = sistema"
+        varchar tipo
+        int quantidade
+        varchar motivo
+        timestamp data_hora
+    }
+    usuario {
+        int id PK
+        int unidade_id FK "nulo = matriz"
+        varchar nome
+        varchar email UK
+        varchar senha_hash
+        varchar perfil
+        boolean ativo
+    }
+    cliente {
+        int id PK
+        varchar nome
+        varchar email UK
+        varchar telefone
+        varchar senha_hash
+        date data_nascimento "opcional"
+        int saldo_pontos
+        boolean anonimizado
+        timestamp criado_em
+    }
+    consentimento {
+        int id PK
+        int cliente_id FK
+        varchar finalidade
+        boolean concedido
+        varchar versao_termo
+        timestamp data_hora
+    }
+    pedido {
+        int id PK
+        int unidade_id FK
+        int cliente_id FK "nulo = anônimo"
+        int criado_por_id FK "usuario, nulo = autoatendimento"
+        varchar canal
+        varchar tipo_atendimento
+        varchar status
+        decimal valor_itens
+        decimal valor_desconto
+        decimal valor_total
+        int pontos_resgatados
+        timestamp criado_em
+        int version
+    }
+    item_pedido {
+        int id PK
+        int pedido_id FK
+        int produto_id FK
+        int quantidade
+        decimal preco_unitario
+        decimal subtotal
+    }
+    historico_status_pedido {
+        int id PK
+        int pedido_id FK
+        int usuario_id FK "nulo = sistema"
+        varchar status_anterior
+        varchar status_novo
+        timestamp data_hora
+    }
+    pagamento {
+        int id PK
+        int pedido_id FK
+        varchar chave_idempotencia UK
+        varchar id_transacao_externa
+        varchar forma
+        decimal valor
+        varchar status
+        timestamp atualizado_em
+    }
+    movimento_pontos {
+        int id PK
+        int cliente_id FK
+        int pedido_id FK "opcional"
+        varchar tipo
+        int pontos
+        timestamp data_hora
+    }
+    registro_auditoria {
+        int id PK
+        int usuario_id FK "nulo = cliente ou sistema"
+        int unidade_id FK "opcional"
+        varchar acao
+        varchar entidade
+        int entidade_id
+        text valor_anterior
+        text valor_novo
+        varchar motivo
+        timestamp data_hora
+    }
+
+    unidade ||--o{ item_cardapio : oferece
+    produto ||--o{ item_cardapio : compoe
+    unidade ||--o{ estoque : mantem
+    produto ||--o{ estoque : controla
+    estoque ||--o{ movimentacao_estoque : registra
+    usuario |o--o{ movimentacao_estoque : executa
+    unidade |o--o{ usuario : lota
+    cliente ||--o{ consentimento : concede
+    unidade ||--o{ pedido : recebe
+    cliente |o--o{ pedido : realiza
+    usuario |o--o{ pedido : registra
+    pedido ||--|{ item_pedido : contem
+    produto ||--o{ item_pedido : vendido_em
+    pedido ||--|{ historico_status_pedido : historico
+    usuario |o--o{ historico_status_pedido : altera
+    pedido ||--o{ pagamento : tentativas
+    cliente ||--o{ movimento_pontos : extrato
+    pedido |o--o{ movimento_pontos : origina
+    usuario |o--o{ registro_auditoria : autor
+    unidade |o--o{ registro_auditoria : escopo
