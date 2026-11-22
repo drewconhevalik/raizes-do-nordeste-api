@@ -1,0 +1,21 @@
+---
+title: Implantação proposta para produção
+---
+flowchart TB
+    C1["App / Totens / Balcões / Painel da matriz<br/>(todas as unidades)"]
+    PSP["Provedor de pagamento<br/>(sistema externo)"]
+    subgraph NUVEM["Provedor de nuvem"]
+        LB["Balanceador de carga<br/>HTTPS / TLS"]
+        API["Instâncias da API (contêineres)<br/>N réplicas sem estado de sessão<br/>autoescalonamento nos horários de pico"]
+        MON["Monitoramento<br/>health check · logs · métricas"]
+        PG1[("PostgreSQL primário<br/>escritas e transações")]
+        PG2[("PostgreSQL réplica<br/>leitura para relatórios")]
+    end
+    C1 -- "HTTPS" --> LB
+    LB -- "distribui requisições" --> API
+    API -- "JDBC" --> PG1
+    API -. "consultas de relatórios" .-> PG2
+    PG1 -- "replicação" --> PG2
+    API -- "solicita pagamento" --> PSP
+    PSP -- "webhook de confirmação" --> LB
+    MON -. "verifica /actuator/health" .-> API

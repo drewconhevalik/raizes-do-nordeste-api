@@ -1,0 +1,31 @@
+---
+title: Arquitetura em camadas e módulos da API
+---
+flowchart TB
+    subgraph CLIENTES["Consumidores da API (fora do escopo da trilha)"]
+        APP["App do cliente"]
+        TOTEM["Totem de autoatendimento"]
+        BALCAO["Sistema do balcão / cozinha"]
+        PAINEL["Painel da matriz"]
+    end
+
+    subgraph API["API Raízes do Nordeste (Spring Boot)"]
+        direction TB
+        SEC["Segurança<br/>Spring Security + JWT<br/>perfis e escopo por unidade"]
+        CTRL["Camada de apresentação<br/>Controllers REST /api/v1<br/>DTOs + Bean Validation<br/>Tratamento de erros (Problem Details)"]
+        SVC["Camada de serviço (regras de negócio)<br/>Pedido · Cardápio · Estoque · Pagamento<br/>Fidelidade · Cliente/LGPD · Auditoria · Relatórios"]
+        REPO["Camada de persistência<br/>Spring Data JPA (Repositories)"]
+        GW["Porta de integração<br/>interface GatewayPagamento"]
+        SIM["GatewayPagamentoSimulado"]
+        SEC --> CTRL --> SVC --> REPO
+        SVC --> GW
+        GW -. implementa .- SIM
+    end
+
+    DB[("Banco relacional<br/>PostgreSQL (produção)<br/>H2 (demonstração/testes)")]
+    EXT["Serviço externo de pagamento"]
+
+    APP & TOTEM & BALCAO & PAINEL -- "HTTPS + JSON" --> SEC
+    REPO --> DB
+    SIM -. "substituível" .-> EXT
+    EXT -- "webhook" --> SEC

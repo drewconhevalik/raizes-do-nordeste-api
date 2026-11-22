@@ -1,0 +1,51 @@
+---
+title: Sequência — Realizar pedido e pagamento (com falhas tratadas)
+---
+sequenceDiagram
+    autonumber
+    actor C as Cliente (app/totem)
+    participant API as API (PedidoController)
+    participant PS as PedidoService
+    participant DB as Banco de dados
+    participant PG as PagamentoService
+    participant GW as Serviço de pagamento
+
+    C->>API: POST /api/v1/pedidos (unidade, canal, itens)
+    API->>PS: criarPedido(dto)
+    PS->>DB: valida cardápio (RN01) e baixa estoque (RN03)
+    alt estoque insuficiente ou conflito de concorrência
+        DB-->>PS: falha / versão desatualizada
+        PS-->>API: erro de negócio
+        API-->>C: 422 / 409 (nada é gravado)
+    else estoque OK
+        PS->>DB: grava pedido AGUARDANDO_PAGAMENTO (mesma transação)
+        API-->>C: 201 Created (id, total, status)
+    end
+
+    C->>API: POST /pedidos/{id}/pagamentos + Idempotency-Key
+    API->>PG: iniciarPagamento(pedido, forma, chave)
+    PG->>DB: chave já existe?
+    alt chave repetida
+        PG-->>API: devolve o pagamento já registrado (sem nova cobrança)
+    else nova solicitação
+        PG->>DB: grava Pagamento PENDENTE
+        PG->>GW: solicitarPagamento (tempo limite)
+        alt aprovado
+            GW-->>PG: APROVADO
+            PG->>DB: Pagamento APROVADO, Pedido PAGO, credita pontos (RN08)
+        else recusado
+            GW-->>PG: RECUSADO
+            PG->>DB: Pagamento RECUSADO, pedido continua aguardando (nova tentativa possível)
+        else indisponível / tempo esgotado
+            GW--xPG: erro ou sem resposta
+            PG->>DB: Pagamento ERRO, pedido continua aguardando
+        end
+    end
+    API-->>C: status do pagamento
+
+    opt confirmação assíncrona (ex.: Pix)
+        GW->>API: POST /pagamentos/webhook (idTransacao, resultado)
+        API->>PG: processarRetorno (idempotente, RN14)
+        PG->>DB: atualiza Pagamento e Pedido
+    end
+    Note over PS,DB: Pedido sem pagamento em 15 min expira e devolve o estoque (RN04)

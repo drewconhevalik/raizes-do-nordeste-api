@@ -1,0 +1,15 @@
+---
+title: Estados do pedido (RN05)
+---
+stateDiagram-v2
+    direction LR
+    [*] --> AGUARDANDO_PAGAMENTO: pedido criado (estoque reservado)
+    AGUARDANDO_PAGAMENTO --> PAGO: pagamento aprovado
+    AGUARDANDO_PAGAMENTO --> CANCELADO: cancelado (atendente/gerente) ou expirado em 15 min
+    PAGO --> EM_PREPARO: cozinha inicia
+    PAGO --> CANCELADO: gerente cancela (estorno solicitado)
+    EM_PREPARO --> PRONTO: cozinha finaliza
+    EM_PREPARO --> CANCELADO: gerente cancela (estorno solicitado)
+    PRONTO --> ENTREGUE: atendente entrega
+    ENTREGUE --> [*]
+    CANCELADO --> [*]
