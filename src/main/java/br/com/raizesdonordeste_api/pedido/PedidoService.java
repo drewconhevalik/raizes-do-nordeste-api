@@ -3,6 +3,7 @@ package br.com.raizesdonordeste_api.pedido;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -268,6 +269,24 @@ public class PedidoService {
         auditoria.registrar(AcaoAuditoria.DESCONTO_PEDIDO, pedido.getUnidade(), "Pedido", pedido.getId(),
                 totalAnterior, pedido.getValorTotal().toPlainString(), req.motivo());
         return PedidoResponse.de(pedido);
+    }
+
+    /**
+     * RN04: cancela os pedidos aguardando pagamento criados antes do limite, devolvendo o
+     * estoque. Executado pelo sistema (sem usuário); o registro de auditoria fica sem autor.
+     */
+    @Transactional
+    public int expirarPendentes(LocalDateTime limite) {
+        List<Pedido> vencidos = pedidoRepository.findByStatusAndCriadoEmBefore(StatusPedido.AGUARDANDO_PAGAMENTO, limite);
+        for (Pedido pedido : vencidos) {
+            pedido.alterarStatus(StatusPedido.CANCELADO, null);
+            devolverEstoque(pedido, null);
+            auditoria.registrar(AcaoAuditoria.CANCELAMENTO_PEDIDO, pedido.getUnidade(), "Pedido", pedido.getId(),
+                    StatusPedido.AGUARDANDO_PAGAMENTO.name(), StatusPedido.CANCELADO.name(),
+                    "Expirado: sem confirmação de pagamento em 15 minutos");
+            eventos.publishEvent(new PedidoCanceladoEvent(pedido.getId(), StatusPedido.AGUARDANDO_PAGAMENTO));
+        }
+        return vencidos.size();
     }
 
     /** Devolve ao estoque os itens de um pedido cancelado (também usado na expiração, RN04). */

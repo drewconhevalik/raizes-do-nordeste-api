@@ -8,6 +8,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -74,6 +76,28 @@ public abstract class ApiTestBase {
     protected static String pedidoJson(Integer unidadeId, String canal, Integer produtoId, int quantidade) {
         return "{\"unidadeId\":" + unidadeId + ",\"canal\":\"" + canal + "\",\"tipoAtendimento\":\"RETIRADA\","
                 + "\"itens\":[{\"produtoId\":" + produtoId + ",\"quantidade\":" + quantidade + "}]}";
+    }
+
+    /** Cria pedido na unidade de Recife; token nulo = pedido anônimo. Devolve o JSON da resposta. */
+    protected String criarPedido(String token, String canal, String produto, int quantidade) throws Exception {
+        MockHttpServletRequestBuilder req = post("/api/v1/pedidos")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(pedidoJson(unidadeId("Raízes Boa Viagem"), canal, produtoId(produto), quantidade));
+        if (token != null) {
+            req.header("Authorization", token);
+        }
+        return mvc.perform(req).andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+    }
+
+    protected ResultActions pagar(Integer pedidoId, String forma, String chave, String token) throws Exception {
+        MockHttpServletRequestBuilder req = post("/api/v1/pedidos/" + pedidoId + "/pagamentos")
+                .header("Idempotency-Key", chave)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"forma\":\"" + forma + "\"}");
+        if (token != null) {
+            req.header("Authorization", token);
+        }
+        return mvc.perform(req);
     }
 
     protected <T> T ler(String json, String caminho) {

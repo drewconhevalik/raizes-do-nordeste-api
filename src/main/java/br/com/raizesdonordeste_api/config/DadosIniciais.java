@@ -18,6 +18,9 @@ import br.com.raizesdonordeste_api.cliente.ClienteRepository;
 import br.com.raizesdonordeste_api.cliente.Finalidade;
 import br.com.raizesdonordeste_api.estoque.Estoque;
 import br.com.raizesdonordeste_api.estoque.EstoqueRepository;
+import br.com.raizesdonordeste_api.fidelidade.MovimentoPontos;
+import br.com.raizesdonordeste_api.fidelidade.MovimentoPontosRepository;
+import br.com.raizesdonordeste_api.fidelidade.TipoMovimentoPontos;
 import br.com.raizesdonordeste_api.unidade.FormatoUnidade;
 import br.com.raizesdonordeste_api.unidade.Regiao;
 import br.com.raizesdonordeste_api.unidade.Unidade;
@@ -45,17 +48,19 @@ public class DadosIniciais implements CommandLineRunner {
     private final EstoqueRepository estoques;
     private final UsuarioRepository usuarios;
     private final ClienteRepository clientes;
+    private final MovimentoPontosRepository movimentosPontos;
     private final PasswordEncoder passwordEncoder;
 
     public DadosIniciais(UnidadeRepository unidades, ProdutoRepository produtos, ItemCardapioRepository cardapio,
             EstoqueRepository estoques, UsuarioRepository usuarios, ClienteRepository clientes,
-            PasswordEncoder passwordEncoder) {
+            MovimentoPontosRepository movimentosPontos, PasswordEncoder passwordEncoder) {
         this.unidades = unidades;
         this.produtos = produtos;
         this.cardapio = cardapio;
         this.estoques = estoques;
         this.usuarios = usuarios;
         this.clientes = clientes;
+        this.movimentosPontos = movimentosPontos;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -117,7 +122,9 @@ public class DadosIniciais implements CommandLineRunner {
         Cliente maria = new Cliente("Maria da Silva", "maria@email.com", "81999990000", senha, LocalDate.of(1990, 5, 10));
         maria.registrarConsentimento(Finalidade.FIDELIDADE, true, "v1");
         maria.registrarConsentimento(Finalidade.MARKETING, false, "v1");
+        maria.creditarPontos(250); // saldo inicial de demonstração para o resgate de pontos
         clientes.save(maria);
+        movimentosPontos.save(new MovimentoPontos(maria, null, TipoMovimentoPontos.CREDITO, 250));
     }
 
     private Produto produto(String nome, String descricao, CategoriaProduto categoria, String preco, boolean exigeCozinha) {

@@ -1,5 +1,8 @@
 package br.com.raizesdonordeste_api.auditoria;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,5 +36,19 @@ public class AuditoriaService {
                 .orElse(null);
         repository.save(new RegistroAuditoria(autor, unidade, acao, entidade, entidadeId, valorAnterior, valorNovo,
                 motivo));
+    }
+
+    /** Consulta da trilha (RF21), do mais recente para o mais antigo; padrão: últimos 30 dias. */
+    @Transactional(readOnly = true)
+    public List<RegistroAuditoriaResponse> consultar(LocalDate inicio, LocalDate fim, AcaoAuditoria acao,
+            Integer unidadeId) {
+        LocalDate f = fim != null ? fim : LocalDate.now();
+        LocalDate i = inicio != null ? inicio : f.minusDays(30);
+        return repository.findTop500ByDataHoraBetweenOrderByDataHoraDesc(i.atStartOfDay(), f.plusDays(1).atStartOfDay())
+                .stream()
+                .filter(r -> acao == null || r.getAcao() == acao)
+                .filter(r -> unidadeId == null || (r.getUnidade() != null && unidadeId.equals(r.getUnidade().getId())))
+                .map(RegistroAuditoriaResponse::de)
+                .toList();
     }
 }
