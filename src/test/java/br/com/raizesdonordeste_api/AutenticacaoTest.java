@@ -54,7 +54,7 @@ class AutenticacaoTest {
     void loginValido() throws Exception {
         mvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"gerente.recife@raizes.com\",\"senha\":\"Senha@123\"}"))
+                        .content("{\"email\":\"gerente.recife@rnordeste.com\",\"senha\":\"Senha@123\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").isNotEmpty())
                 .andExpect(jsonPath("$.papel").value("GERENTE"))
@@ -66,7 +66,7 @@ class AutenticacaoTest {
     void loginSenhaErrada() throws Exception {
         mvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"gerente.recife@raizes.com\",\"senha\":\"errada\"}"))
+                        .content("{\"email\":\"gerente.recife@rnordeste.com\",\"senha\":\"errada\"}"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.token").doesNotExist());
     }
@@ -109,7 +109,7 @@ class AutenticacaoTest {
     @Test
     @DisplayName("CT-AUT-07: perfil sem permissão (atendente criando unidade) devolve 403")
     void perfilSemPermissao() throws Exception {
-        String token = login("/api/v1/auth/login", "atendente.recife@raizes.com", "Senha@123");
+        String token = login("/api/v1/auth/login", "atendente.recife@rnordeste.com", "Senha@123");
         mvc.perform(post("/api/v1/unidades")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON).content(UNIDADE_JSON))
@@ -119,7 +119,7 @@ class AutenticacaoTest {
     @Test
     @DisplayName("CT-AUT-08: administrador da matriz cria unidade (201)")
     void adminCriaUnidade() throws Exception {
-        String token = login("/api/v1/auth/login", "admin@raizes.com", "Senha@123");
+        String token = login("/api/v1/auth/login", "admin@rnordeste.com", "Senha@123");
         mvc.perform(post("/api/v1/unidades")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON).content(UNIDADE_JSON))

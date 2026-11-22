@@ -76,7 +76,7 @@ public class DadosIniciais implements CommandLineRunner {
         Produto tapiocaQueijo = produto("Tapioca de queijo coalho", "Tapioca com queijo coalho e manteiga de garrafa", CategoriaProduto.TAPIOCA, "14.50", false);
         Produto cuscuz = produto("Cuscuz recheado com charque", "Cuscuz de milho recheado com charque acebolado", CategoriaProduto.CUSCUZ, "22.00", true);
         Produto bolo = produto("Bolo de macaxeira", "Fatia de bolo de macaxeira", CategoriaProduto.BOLO, "9.00", false);
-        Produto suco = produto("Suco de cajá", "Suco natural de cajá 400 ml", CategoriaProduto.BEBIDA, "8.50", false);
+        Produto suco = produto("Suco de graviola", "Suco natural de graviola 400 ml", CategoriaProduto.BEBIDA, "8.50", false);
         Produto cafe = produto("Café coado", "Café passado na hora 200 ml", CategoriaProduto.BEBIDA, "5.00", false);
         Produto cafeCompleto = produto("Café da manhã completo", "Cuscuz, ovo, queijo coalho, tapioca e café", CategoriaProduto.CAFE_DA_MANHA, "32.00", true);
         Produto canjica = produto("Canjica", "Canjica de milho (período junino)", CategoriaProduto.BOLO, "10.00", false);
@@ -107,11 +107,11 @@ public class DadosIniciais implements CommandLineRunner {
 
         // Usuários internos
         String senha = passwordEncoder.encode(SENHA_DEMO);
-        usuarios.save(new Usuario(null, "Administrador da Matriz", "admin@raizes.com", senha, Perfil.ADMIN_MATRIZ));
-        usuarios.save(new Usuario(recife, "Gerente Recife", "gerente.recife@raizes.com", senha, Perfil.GERENTE));
-        usuarios.save(new Usuario(recife, "Atendente Recife", "atendente.recife@raizes.com", senha, Perfil.ATENDENTE));
-        usuarios.save(new Usuario(recife, "Cozinha Recife", "cozinha.recife@raizes.com", senha, Perfil.COZINHA));
-        usuarios.save(new Usuario(saoPaulo, "Gerente São Paulo", "gerente.sp@raizes.com", senha, Perfil.GERENTE));
+        usuarios.save(new Usuario(null, "Administrador da Matriz", "admin@rnordeste.com", senha, Perfil.ADMIN_MATRIZ));
+        usuarios.save(new Usuario(recife, "Gerente Recife", "gerente.recife@rnordeste.com", senha, Perfil.GERENTE));
+        usuarios.save(new Usuario(recife, "Atendente Recife", "atendente.recife@rnordeste.com", senha, Perfil.ATENDENTE));
+        usuarios.save(new Usuario(recife, "Cozinha Recife", "cozinha.recife@rnordeste.com", senha, Perfil.COZINHA));
+        usuarios.save(new Usuario(saoPaulo, "Gerente São Paulo", "gerente.sp@rnordeste.com", senha, Perfil.GERENTE));
 
         // Cliente com consentimento de fidelidade e sem consentimento de marketing
         Cliente maria = new Cliente("Maria da Silva", "maria@email.com", "81999990000", senha, LocalDate.of(1990, 5, 10));
