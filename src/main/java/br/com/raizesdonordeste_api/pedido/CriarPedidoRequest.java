@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Size;
 
 /**
  * Criação de pedido (RF08). O cliente é identificado pelo token, quando houver;
- * {@code pontosResgatar} é opcional (RF16, implementado na E7).
+ * {@code pontosResgatar} é opcional (RF16).
  */
 public record CriarPedidoRequest(
         @NotNull Integer unidadeId,

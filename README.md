@@ -17,7 +17,7 @@ A API atende, com um único contrato, os canais de venda da rede (aplicativo, to
 | Spring Security + OAuth2 Resource Server (JWT HS256) | Autenticação sem sessão e autorização por perfil |
 | H2 (em memória) | Banco da demonstração e dos testes; o alvo de produção é PostgreSQL |
 | springdoc-openapi 3.2 | Documentação OpenAPI / Swagger UI |
-| JUnit 5 + MockMvc | Testes automatizados (53 testes) |
+| JUnit 5 + MockMvc | Testes automatizados (55 testes) |
 | Postman | Coleção de testes de API (56 requisições encadeadas) |
 | Maven Wrapper | Build sem instalar o Maven |
 
@@ -78,7 +78,7 @@ Toda solicitação de pagamento exige o cabeçalho `Idempotency-Key`. Repetir a 
 ./mvnw test            # Linux/macOS
 ```
 
-- **53 testes automatizados**, que sobem a aplicação completa e verificam regras de negócio, segurança, LGPD e falhas de integração. Resultado da última execução: [docs/evidencias/testes-automatizados.md](docs/evidencias/testes-automatizados.md).
+- **55 testes automatizados**, que sobem a aplicação completa e verificam regras de negócio, segurança, LGPD e falhas de integração. Resultado da última execução: [docs/evidencias/testes-automatizados.md](docs/evidencias/testes-automatizados.md).
 - **Coleção Postman:** [postman/raizes-do-nordeste.postman_collection.json](postman/raizes-do-nordeste.postman_collection.json), com 56 requisições (P01 a P56) e testes em cada uma. Importe no Postman e execute pelo *Collection Runner* com a API recém-iniciada.
 
 ## Documentação do projeto

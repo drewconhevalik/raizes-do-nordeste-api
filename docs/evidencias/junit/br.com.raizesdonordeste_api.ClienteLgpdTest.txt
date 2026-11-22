@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: br.com.raizesdonordeste_api.ClienteLgpdTest
 -------------------------------------------------------------------------------
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.718 s -- in br.com.raizesdonordeste_api.ClienteLgpdTest
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.836 s -- in br.com.raizesdonordeste_api.ClienteLgpdTest

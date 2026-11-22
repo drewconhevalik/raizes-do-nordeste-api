@@ -132,6 +132,7 @@ Formato: pré-condição, entrada, passos e resultado esperado. **(+)** indica c
 **Executado (indicativo): CT-DES-01**
 - 50 acessos simultâneos à consulta de cardápio, 20 requisições cada (1.000 no total).
 - Meta: p95 menor que 300 ms.
+- **Resultado medido** na máquina do aluno: p50 = 4 ms, **p95 = 189 ms**, máximo = 812 ms. A meta foi atendida.
 - O teste roda dentro do processo, sem rede. Ele serve para pegar uma regressão grave de desempenho, por exemplo uma consulta que deixou de usar índice, mas **não substitui** um teste de carga.
 
 **Planejado: teste de carga com Apache JMeter**
@@ -146,7 +147,7 @@ Formato: pré-condição, entrada, passos e resultado esperado. **(+)** indica c
 
 ### 7.2 Concorrência (RNF04)
 
-**Executado: CT-CON-01.** Dez pedidos simultâneos disputam o último item. O controle otimista (campo `version` no estoque), junto com a transação única do pedido, garante que só um é aceito e que o saldo nunca fica negativo.
+**Executado e aprovado: CT-CON-01.** Dez pedidos simultâneos disputam o último item. O controle otimista (campo `version` no estoque), junto com a transação única do pedido, garante que só um é aceito e que o saldo nunca fica negativo.
 
 ### 7.3 Tolerância a falhas da integração (RNF05)
 
@@ -185,11 +186,11 @@ Em todos os casos, o pedido é preservado e não há cobrança duplicada.
 
 | Execução | Resultado | Evidência |
 |---|---|---|
-| Testes automatizados (`./mvnw test`) | 55 testes, 0 falhas | `docs/evidencias/testes-automatizados.md` e `docs/evidencias/junit/` |
+| Testes automatizados (`./mvnw test`) | 55 testes, 55 aprovados, 0 falhas; CT-DES-01 com p95 = 189 ms | `docs/evidencias/testes-automatizados.md` e `docs/evidencias/junit/` |
 | Coleção Postman (56 requisições, 95 verificações) | 95 de 95 aprovadas, 0 erros, 6,2 s | `docs/evidencias/prints/postman-runner.png` |
 | Documentação OpenAPI | Swagger UI acessível com todos os endpoints | `docs/evidencias/prints/swagger.png` |
 
-**Defeitos:** nenhum defeito aberto. Durante o desenvolvimento, os testes foram executados ao fim de cada etapa (E5, E6 e E7). Todas as rodadas terminaram sem falhas antes do commit.
+**Defeitos:** nenhum defeito aberto. Durante o desenvolvimento, os testes foram executados ao fim de cada módulo implementado. Todas as rodadas terminaram sem falhas antes do commit.
 
 ## 9. Riscos e limitações dos testes
 
