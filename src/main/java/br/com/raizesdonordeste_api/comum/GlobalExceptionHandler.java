@@ -1,9 +1,9 @@
 package br.com.raizesdonordeste_api.comum;
 
+import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -37,8 +37,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problema(HttpStatus.CONFLICT, "Conflito", e.getMessage());
     }
 
-    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
-    public ProblemDetail tratar(ObjectOptimisticLockingFailureException e) {
+    /** Conflito otimista (campo version) ou bloqueio do banco em acesso simultâneo (RNF04). */
+    @ExceptionHandler(ConcurrencyFailureException.class)
+    public ProblemDetail tratar(ConcurrencyFailureException e) {
         return problema(HttpStatus.CONFLICT, "Conflito de concorrência",
                 "O registro foi alterado por outra operação ao mesmo tempo. Tente novamente.");
     }
