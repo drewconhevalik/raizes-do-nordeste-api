@@ -6,7 +6,7 @@ erDiagram
         int id PK
         varchar nome
         varchar cidade
-        char uf
+        varchar uf
         varchar regiao
         varchar formato
         boolean ativa
@@ -86,6 +86,7 @@ erDiagram
         decimal valor_desconto
         decimal valor_total
         int pontos_resgatados
+        varchar codigo_acompanhamento UK
         timestamp criado_em
         int version
     }
@@ -130,8 +131,8 @@ erDiagram
         varchar acao
         varchar entidade
         int entidade_id
-        text valor_anterior
-        text valor_novo
+        varchar valor_anterior
+        varchar valor_novo
         varchar motivo
         timestamp data_hora
     }

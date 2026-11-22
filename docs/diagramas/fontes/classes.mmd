@@ -36,7 +36,7 @@ classDiagram
     class Estoque {
         -id
         -int quantidade
-        -Long version
+        -Integer version
         +baixar(int quantidade)
         +repor(int quantidade)
     }
@@ -84,8 +84,9 @@ classDiagram
         -BigDecimal valorDesconto
         -BigDecimal valorTotal
         -int pontosResgatados
+        -String codigoAcompanhamento
         -LocalDateTime criadoEm
-        -Long version
+        -Integer version
         +adicionarItem(Produto p, int qtd, BigDecimal preco)
         +aplicarDesconto(BigDecimal valor)
         +alterarStatus(StatusPedido novo)
@@ -151,6 +152,7 @@ classDiagram
     Cliente "1" *-- "0..*" Consentimento : concede
     Cliente "0..1" -- "0..*" Pedido : realiza
     Unidade "1" -- "0..*" Pedido : recebe
+    Usuario "0..1" -- "0..*" Pedido : registra
     Pedido "1" *-- "1..*" ItemPedido : contém
     ItemPedido "0..*" --> "1" Produto : refere
     Pedido "1" *-- "1..*" HistoricoStatusPedido : histórico
